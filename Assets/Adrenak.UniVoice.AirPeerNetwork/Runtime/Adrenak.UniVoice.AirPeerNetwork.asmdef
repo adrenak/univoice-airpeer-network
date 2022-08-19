@@ -1,0 +1,16 @@
+{
+    "name": "Adrenak.UniVoice.ChatroomNetwork.AirPeer",
+    "references": [
+        "GUID:8a6ea9d3c31d87b45abed77163bb4413",
+        "GUID:6b289bb677194eb40b60db3a566aab7b"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
