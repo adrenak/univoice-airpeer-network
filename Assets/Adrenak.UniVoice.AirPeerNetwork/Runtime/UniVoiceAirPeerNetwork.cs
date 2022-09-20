@@ -30,8 +30,8 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
         public event Action<short> OnPeerJoinedChatroom;
         public event Action<short> OnPeerLeftChatroom;
 
-        public event Action<ChatroomAudioSegment> OnAudioReceived;
-        public event Action<ChatroomAudioSegment> OnAudioSent;
+        public event Action<short, ChatroomAudioSegment> OnAudioReceived;
+        public event Action<short, ChatroomAudioSegment> OnAudioSent;
 
         public short OwnID => node.ID;
 
@@ -90,8 +90,7 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
                     var channels = reader.ReadInt();
                     var samples = reader.ReadFloatArray();
 
-                    OnAudioReceived?.Invoke(new ChatroomAudioSegment {
-                        id = sender,
+                    OnAudioReceived?.Invoke(sender, new ChatroomAudioSegment {
                         segmentIndex = index,
                         frequency = frequency,
                         channelCount = channels,
@@ -113,10 +112,9 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
         public void LeaveChatroom(object data = null) =>
             node.Disconnect();
 
-        public void SendAudioSegment(ChatroomAudioSegment data) {
+        public void SendAudioSegment(short peerID, ChatroomAudioSegment data) {
             if (OwnID == -1) return;
 
-            var recipientID = data.id;
             var segmentIndex = data.segmentIndex;
             var frequency = data.frequency;
             var channelCount = data.channelCount;
@@ -131,8 +129,8 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
                     .Bytes
                 );
 
-            node.SendPacket(recipientID, packet, false);
-            OnAudioSent?.Invoke(data);
+            node.SendPacket(peerID, packet, false);
+            OnAudioSent?.Invoke(peerID, data);
         }
 
         public void Dispose() => node.Dispose();
