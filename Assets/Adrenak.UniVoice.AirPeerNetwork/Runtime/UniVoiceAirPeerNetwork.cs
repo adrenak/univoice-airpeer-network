@@ -37,6 +37,9 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
         public event Action<short, ChatroomAudioSegment> OnAudioReceived;
         public event Action<short, ChatroomAudioSegment> OnAudioSent;
 
+        public event Action<short, string> OnCommonDataReceived;
+        public event Action<short, string> OnCommonDataSent; 
+
         public short OwnID => node.ID;
 
         public List<short> PeerIDs =>
@@ -133,6 +136,12 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
                         samples = samples
                     });
                 }
+                // "common" tag is used for sending common data via string
+                else if (packet.Tag.Equals("common"))
+                {
+                    var reader = new BytesReader(packet.Payload);
+                    OnCommonDataReceived?.Invoke(sender, reader.ReadString());
+                }
             };
         }
 
@@ -169,6 +178,16 @@ namespace Adrenak.UniVoice.AirPeerNetwork {
 
             node.SendPacket(peerID, packet, false);
             OnAudioSent?.Invoke(peerID, data);
+        }
+
+        public void SendCommonData(short peerID, string data)
+        {
+            if (OwnID == -1) return;
+
+            var packet = new Packet().WithTag("common").WithPayload(new BytesWriter().WriteString(data).Bytes);
+            
+            node.SendPacket(peerID, packet, true);
+            OnCommonDataSent?.Invoke(peerID, data);
         }
 
         public void Dispose() => node.Dispose();
